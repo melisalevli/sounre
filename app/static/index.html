@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sounre</title>
-<link rel="icon" type="image/png" href="sounre.png">
-<link rel="apple-touch-icon" href="sounre.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon.png">
+<link rel="apple-touch-icon" href="mobile-icon.png">
 <link rel="preconnect" href="https://coverartarchive.org" crossorigin>
 <style>
 :root{color-scheme:dark;--cream:#F2F0E9;--walnut:#4A3A31;--bark:#362A22;--cork:#7A6A5F;--ember:#8FAFC0;
@@ -24,6 +24,7 @@ nav{align-items:flex-start}
 .brand{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:600;letter-spacing:.1em}
 footer{position:fixed;inset:auto 0 0;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:16px 24px calc(20px + env(safe-area-inset-bottom,0px));z-index:5;pointer-events:none}
 footer small{font-size:10px;opacity:.7;letter-spacing:.1em}
+.search{display:flex;flex-direction:column;gap:18px;width:100%}
 .under{display:flex;flex-direction:column;gap:18px;width:100%}
 main:not(.res){grid-template-columns:min(58vh,42vw) minmax(280px,380px);justify-content:center;justify-items:stretch;column-gap:96px}
 main:not(.res) .under{padding-top:14px;gap:12px}
@@ -126,7 +127,22 @@ footer .credit{font-size:clamp(4px,1.1vw,6px);white-space:nowrap;color:var(--emb
 
 @media(min-width:901px){main.res .col,main.res .card{scale:.88}}  /* shrinks around each block's own centre, so the centre points do not move */
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.st{opacity:1;transform:none}}
-@media(max-width:900px){main:not(.res){padding-bottom:48px;grid-template-columns:1fr;justify-items:center}main:not(.res) .under{position:static;translate:none;width:100%;padding-top:0}main,main.res{grid-template-columns:1fr;padding:88px 24px 72px;gap:28px}.stage{max-width:380px;margin:0 auto 20px;order:-1}.body{font-size:22px}.card,main.res .card{justify-self:center}}
+@media(max-width:900px){
+ /* mobile: one centred column -> disc on top, search bar under it, results under the search bar */
+ body{display:flex;flex-direction:column;padding-bottom:0}
+ main,main:not(.res),main.res{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;flex:1;min-height:0;gap:48px;padding:84px 24px 32px}
+ .col,.under{display:contents}  /* children join main's column so each can be ordered on its own */
+ main .stage,main:not(.res) .stage{order:1;flex:none;width:min(100%,360px,42svh);max-width:none;margin:0 auto}
+ main .card,main.res .card{order:2;justify-self:auto;width:100%;max-width:320px;margin-top:-2px}
+ #clear{order:4;margin-top:-26px}
+ #m{order:5;width:100%;max-width:340px}
+ #dr{order:6;width:100%;max-width:340px;margin-top:-26px}
+ main .drawer>ul,main .drawer.open>ul{max-height:none}
+ .search{order:3;position:static;align-items:stretch;gap:12px;margin:0;width:100%;max-width:340px;padding:0;background:none;border:0}  /* follows the content at a fixed distance instead of being pinned to the screen bottom */
+ main .field input,main:not(.res) .field input,main.res .field input{font-size:16px}  /* 16px: iOS Safari zooms the page on smaller inputs */
+ footer{order:10;position:static;inset:auto;padding:14px 24px calc(14px + env(safe-area-inset-bottom,0px))}
+ .body{font-size:22px}
+}
 </style>
 </head>
 <body>
@@ -136,11 +152,13 @@ footer .credit{font-size:clamp(4px,1.1vw,6px);white-space:nowrap;color:var(--emb
 <footer><small data-i="foot"></small><small class="credit" data-i="credit"></small></footer>
 <main id="mn">
   <div class="col">
+    <div class="search" id="srch">
     <div class="seg st" style="--i:1" role="group" id="seg"><button class="ghost" type="button" data-k="song" data-i="song"></button><button class="ghost" type="button" data-k="artist" data-i="artist"></button><button class="ghost" type="button" data-k="all" data-i="all"></button></div>
     <form class="field st" style="--i:1" id="f" role="search">
       <input id="q" autocomplete="off">
       <button data-i="go"></button>
     </form>
+    </div>
     <div class="under">
       <button class="ghost" id="clear" type="button" data-i="clear" hidden></button>
       <p class="msg" id="m" role="status"></p>
@@ -284,7 +302,7 @@ function act(k){const D=drawPie.data||[],tip=$('tip');
   if(dx<R){const need=hh+Math.sqrt(R*R-dx*dx);if(Math.abs(py-H/2)<need)py=H/2+Math.sign(py-H/2||cy||-1)*need}
   /* the label must never sit under the result card, the search column, the logo/lang button or the footer:
      if the radial spot collides with any of them, move it straight above (or below) the ring point and let the arrow grow */
-  const O=['.card','.col','.brand','#lg','footer small'].flatMap(s=>[...document.querySelectorAll(s)]).map(el=>{const q=el.getBoundingClientRect();
+  const O=['.card','.col','.search','.brand','#lg','footer small'].flatMap(s=>[...document.querySelectorAll(s)]).map(el=>{const q=el.getBoundingClientRect();
       return q.width&&q.height?{l:q.left-box.left-8,r:q.right-box.left+8,t:q.top-box.top-8,b:q.bottom-box.top+8}:null}).filter(Boolean);
   const rx=W/2+cx*r,ry=H/2+cy*r,clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
   const free=(x,y)=>{const l=x-hw,rr=x+hw,tp=y-hh,bt=y+hh;

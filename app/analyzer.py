@@ -1,6 +1,7 @@
 """Orchestrates MusicBrainz, ListenBrainz and (optionally) Spotify into search and analysis results."""
 import asyncio
 import logging
+import re
 from collections import defaultdict
 from urllib.parse import quote
 
@@ -12,7 +13,7 @@ from .errors import AppError
 from .genres import blend, group_key, profile, rank_weights, required_genres, similarity, strength
 
 log = logging.getLogger(__name__)
-MAX_RESULTS = 8
+MAX_RESULTS = 10
 MAX_RECOMMENDATIONS = 5
 # Most specific votes count most: recording, then artist (the album layer was dropped to save a request).
 LAYERS = (("recording", 3.0), ("artist", 1.0))
@@ -28,9 +29,19 @@ MIN_POOL = 10        # fewer candidates than this: relax the query (drop the lea
 MIN_SIM = 0.4        # below this the genre mixes have little in common: better no suggestion than a wrong one
 
 
+# "Song (Live at ...)", "Song - 2011 Remaster": the same song, so its listens are counted together
+_VERSION = re.compile(
+    r"\s*[\(\[]\s*[^\)\]]*\b(?:live|remaster(?:ed)?|acoustic|demo|radio edit|single version|album version|mono|stereo|deluxe)\b[^\)\]]*[\)\]]"
+    r"|\s+[-\u2013]\s+[^-\u2013]*\b(?:live|remaster(?:ed)?|acoustic|demo|radio edit|single version|album version|mono|stereo)\b.*$",
+    re.I,
+)
+_JUNK_TITLE = re.compile(r"karaoke|tribute|made famous|originally performed|in the style of|backing track", re.I)
+
+
 def _sig(t: dict) -> tuple[str, str]:
-    """Same song, whichever recording/release it came from."""
-    return "".join(c for c in t["title"].casefold() if c.isalnum()), t["artist"].casefold()
+    """Same song, whichever recording/release/version it came from."""
+    title = _VERSION.sub("", t["title"]) or t["title"]
+    return "".join(c for c in title.casefold() if c.isalnum()), t["artist"].casefold()
 
 
 def _unique(tracks: list[dict]) -> list[dict]:
@@ -80,17 +91,24 @@ async def _top_songs(lb: ListenBrainz, artist_id: str | None) -> list[dict]:
         return []
 
 
-async def _artist_songs(mb: MusicBrainz, lb: ListenBrainz, query: str) -> list[tuple[int, dict]]:
-    """What artist mode shows: the artist's most-listened songs, with their listen totals."""
+async def _best_top_songs(mb: MusicBrainz, lb: ListenBrainz, query: str) -> list[dict]:
+    """The most-listened songs of the artist named `query`. Several artists can share a name, so the candidates'
+    top songs are all fetched (cached, side by side) and the artist people really listen to wins."""
     try:
-        artist_id = await mb.artist(query)
+        ids = await mb.artist_candidates(query)
     except AppError as exc:
         log.warning("artist lookup failed for %r: %s", query, exc.key)
-        artist_id = None
-    top = await _top_songs(lb, artist_id)
-    if top:
+        return []
+    lists = await asyncio.gather(*(_top_songs(lb, i) for i in ids))
+    lists = [[t for t in top if not _JUNK_TITLE.search(f"{t['title']} {t['artist']}")] for top in lists]
+    return max(lists, key=lambda top: sum(t.get("listens", 0) for t in top[:5]), default=[])
+
+
+async def _artist_songs(mb: MusicBrainz, lb: ListenBrainz, query: str) -> list[tuple[int, dict]]:
+    """What artist mode shows: the artist's most-listened songs, with their listen totals."""
+    if top := await _best_top_songs(mb, lb, query):
         return ranked(top, {t["id"]: t.get("listens", 0) for t in top})
-    try:  # same fallback as artist mode: recordings credited to the artist, ranked by listens
+    try:  # fallback: recordings credited to the artist, ranked by listens
         tracks = await mb.recordings(query, "artist")
     except AppError:
         return []
@@ -123,13 +141,8 @@ async def search(mb: MusicBrainz, lb: ListenBrainz, query: str, kind: str = "son
         return [t for _, t in merged][:MAX_RESULTS]
 
     if kind == "artist":
-        try:
-            if artist_id := await mb.artist(query):
-                if top := await lb.top_recordings(artist_id):
-                    # same ranking as song search: listens of one song's recordings are summed
-                    return rank(top, {t["id"]: t.get("listens", 0) for t in top})[:MAX_RESULTS]
-        except AppError:  # the shortcut is optional: fall back to ranking recordings credited to the artist
-            pass
+        if found := await _artist_songs(mb, lb, query):
+            return [t for _, t in found][:MAX_RESULTS]
 
     if kind == "song" and len(query.split()) > 1:
         kind = "any"  # some words probably name the artist: skip the narrow search that would come back thin

@@ -105,20 +105,25 @@ class MusicBrainz:
 
     async def artist(self, name: str) -> str | None:
         """MBID of the artist `name` refers to (exact name preferred), or None."""
+        found = await self.artist_candidates(name)
+        return found[0] if found else None
+
+    async def artist_candidates(self, name: str, limit: int = 3) -> list[str]:
+        """MBIDs of the artists `name` may refer to, best name match first (several artists can share one name,
+        so the caller can pick the one people actually listen to)."""
         n = name.strip()
         found = await self._cache.get_or_set(
-            f"mb2:artist:{n.casefold()}", WEEK, lambda: self._artist(n)
+            f"mb3:artists:{n.casefold()}", WEEK, lambda: self._artists(n)
         )
-        return found or None  # "" is cached as "no such artist"
+        return found[:limit]
 
-    async def _artist(self, name: str) -> str:
-        data = await self._get("artist", query=f"artist:{_phrase(name)}", limit=5)
+    async def _artists(self, name: str) -> list[str]:
+        data = await self._get("artist", query=f"artist:{_phrase(name)}", limit=10)
         hits = [h for h in data.get("artists", []) if h.get("score", 0) >= 75]
         exact = [h for h in hits if h["score"] >= 90 and h["name"].casefold() == name.casefold()]
-        pick = next(iter(exact or hits), None)
-        return pick["id"] if pick else ""
+        return [h["id"] for h in (exact or hits)]
 
-    async def recordings(self, query: str, kind: str = "song", limit: int = 30) -> list[dict]:
+    async def recordings(self, query: str, kind: str = "song", limit: int = 100) -> list[dict]:
         """Songs containing every word of `query` in the title (kind="song"), the artist
         (kind="artist"), or each word in either one (kind="any", e.g. "adele hello").
 

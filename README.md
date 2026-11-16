@@ -44,7 +44,7 @@ cd sounre
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-export SOUNRE_CONTACT="https://your-site.example"
+export SOUNRE_CONTACT="your-email@example.com" // or "https://your-site.example"
 uvicorn app.main:create_app --factory --reload
 ```
 
