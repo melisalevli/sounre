@@ -21,10 +21,7 @@ from .i18n import message
 STATIC = Path(__file__).parent / "static"
 
 
-def create_app(
-    settings: Settings | None = None,
-    transport: httpx.AsyncBaseTransport | None = None,  # tests inject a mock here
-) -> FastAPI:
+def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
 
     @asynccontextmanager
@@ -34,7 +31,6 @@ def create_app(
             headers={"User-Agent": settings.user_agent},
             timeout=10,
             follow_redirects=True,
-            transport=transport,
         ) as http:
             app.state.mb = MusicBrainz(http, cache, settings.mb_interval)
             app.state.lb = ListenBrainz(http, cache)

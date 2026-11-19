@@ -4,11 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sounre</title>
-<link rel="icon" type="image/png" sizes="512x512" href="icon.png">
-<link rel="apple-touch-icon" href="mobile-icon.png">
-<link rel="preconnect" href="https://coverartarchive.org" crossorigin>
+<link rel="icon" href="/icon.png" sizes="any">
+<link rel="icon" type="image/png" href="/icon.png?v=2">
+<link rel="shortcut icon" href="/icon.png?v=2">
+<link rel="apple-touch-icon" href="/mobile-icon.png?v=2">
 <style>
-:root{color-scheme:dark;--cream:#F2F0E9;--walnut:#4A3A31;--bark:#362A22;--cork:#7A6A5F;--ember:#8FAFC0;
+:root{color-scheme:dark;--cream:#F2F0E9;--walnut:#4A3A31;--bark:#523F33;--cork:#7A6A5F;--ember:#8FAFC0;
 --spring:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.22,1,.36,1);
 --font:'WF Visual Sans Variable','WF Visual Sans',Inter,Satoshi,'General Sans',ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 --mono:'WF Visual Sans Mono','JetBrains Mono','IBM Plex Mono',ui-monospace,monospace}
@@ -20,10 +21,11 @@ body{margin:0;color:var(--cream);font:500 12px/1.2 var(--font);text-transform:up
 :focus-visible{outline:1px solid var(--cream);outline-offset:6px}
 nav{position:fixed;inset:0 0 auto;display:flex;justify-content:space-between;padding:calc(24px + env(safe-area-inset-top,0px)) 24px 24px;z-index:5}
 nav{align-items:flex-start}
-.logo{height:36px;width:auto;display:block}
+.logo{height:36px;width:36px;object-fit:contain;object-position:center;display:block;flex:none}
 .brand{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:600;letter-spacing:.1em}
 footer{position:fixed;inset:auto 0 0;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:16px 24px calc(20px + env(safe-area-inset-bottom,0px));z-index:5;pointer-events:none}
 footer small{font-size:10px;opacity:.7;letter-spacing:.1em}
+.hl{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .search{display:flex;flex-direction:column;gap:18px;width:100%}
 .under{display:flex;flex-direction:column;gap:18px;width:100%}
 main:not(.res){grid-template-columns:min(58vh,42vw) minmax(280px,380px);justify-content:center;justify-items:stretch;column-gap:96px}
@@ -39,7 +41,7 @@ main:not(.res) .msg{font-size:13px}
 .under .ghost{padding:4px 12px;font-size:10px;border-radius:14px}
 .seg{display:flex;gap:6px;align-self:center;justify-content:center}
 .seg .ghost{padding:5px 14px;font-size:10px;letter-spacing:.1em;transition:scale .4s var(--spring),background-color .3s,color .3s}
-.seg .ghost[aria-pressed=true]{background:var(--cream);color:var(--walnut)}
+.seg .ghost[aria-pressed=true]{background:var(--cream);color:#14181B}
 main:not(.res) .drawer>ul,main:not(.res) .drawer.open>ul{max-height:none;overflow:hidden}
 main.res .col{max-width:320px}
 main.res .field input{font-size:14px;padding:8px 0}
@@ -75,7 +77,7 @@ main:not(.res) .stage{order:-1;width:min(100%,58vh)}
  background:radial-gradient(circle,transparent 0 5%,rgba(235,235,238,.5) 5.2% 16.6%,rgba(0,0,0,.28) 16.8% 17.2%,transparent 17.4%),var(--cover,radial-gradient(circle at 36% 30%,#9a9a9a,#555 45%,#222)) center/cover;
  -webkit-mask:radial-gradient(circle,transparent 0 5%,#000 5.2%);mask:radial-gradient(circle,transparent 0 5%,#000 5.2%);
  animation:spin 14s linear infinite}
-.cd.wait{animation-play-state:paused}  /* once play was pressed the disc turns only while the preview plays (loading and paused: still) */
+/* once play was pressed the disc turns only while the preview plays (loading and paused: still) */
 .cd.load{animation-duration:1.6s}
 .cd::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(rgba(255,255,255,0),rgba(255,255,255,.45) 40deg,rgba(255,255,255,0) 90deg,rgba(0,0,0,.45) 180deg,rgba(255,255,255,0) 220deg,rgba(255,255,255,.35) 300deg,rgba(255,255,255,0))}
 .cd::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid var(--cream)}
@@ -89,7 +91,7 @@ main:not(.res) .stage{order:-1;width:min(100%,58vh)}
 .tip{color:var(--lc,var(--cream))}.tip.on{opacity:1;scale:1}.tip b{font-weight:500}
 .tip::after{content:"";position:absolute;left:var(--ax,50%);top:calc(var(--ay,50%) - 1px);width:var(--al,12px);height:2px;border-radius:2px;background:var(--lc,var(--cream));transform-origin:0 50%;rotate:var(--ar,0rad)}
 /* card */
-.card{display:none;border-radius:12px;padding:20px;max-width:320px;width:100%;justify-self:end;background:rgba(54,42,34,.8);flex-direction:column;gap:12px;text-align:left}
+.card{display:none;border-radius:12px;padding:20px;max-width:320px;width:100%;justify-self:end;background:rgba(30,40,48,.7);backdrop-filter:blur(10px);border:1px solid rgba(143,175,192,.35);box-shadow:0 24px 60px rgba(0,0,0,.35);flex-direction:column;gap:12px;text-align:left}
 .card .body{font-size:20px;text-align:center}
 main.res .card{display:flex;animation:pop .8s var(--spring) .25s both}
 @keyframes pop{from{opacity:0;scale:.85;translate:0 24px}}
@@ -101,8 +103,13 @@ main.res .card{display:flex;animation:pop .8s var(--spring) .25s both}
 .row{cursor:pointer}
 .row.on{background:rgba(242,240,233,.08);translate:6px 0}
 .row.on .sw{scale:1.8}.row.on .det{grid-template-rows:1fr}.row.on .det span{padding-top:6px}
-.pill{display:inline-block;align-self:center;background:var(--bark);color:var(--cream);border-radius:36px;padding:14px 24px;font:500 14px/1 var(--font);text-decoration:none;transition:scale .4s var(--spring)}
+.pill{display:inline-block;align-self:center;background:rgba(242,240,233,.1);color:var(--cream);border-radius:36px;padding:14px 24px;font:500 14px/1 var(--font);text-decoration:none;transition:scale .4s var(--spring),background-color .3s,color .3s}
 .pill[hidden],.ghost[hidden]{display:none}.ln{display:flex;gap:12px;justify-content:center}.ln .pill{padding:12px;display:flex}button.pill{border:0;cursor:pointer}
+.ln .pill:hover{background:var(--ember);color:#14181B}
+/* Find similar = primary action (big, filled blue); Play preview = secondary (outline) */
+#sim{background:var(--ember);color:#14181B;border:0;border-radius:36px;padding:12px 22px;font:600 12px/1 var(--font);letter-spacing:.1em}
+#pl{min-width:96px;white-space:nowrap;text-align:center;padding:9px 16px;font:500 11px/1 var(--font);background:none;border:1px solid rgba(242,240,233,.45);color:rgba(242,240,233,.85)}
+#pl:hover{background:var(--cream);color:#14181B}
 .ghost{background:none;color:var(--cream);border:1px solid var(--cream);border-radius:22.5px;padding:7.5px 18px;font:500 12px var(--font);text-transform:uppercase;cursor:pointer;align-self:flex-start;transition:scale .4s var(--spring)}
 main:not(.res) .ghost{align-self:center}
 #lg{margin-left:auto;transition:scale .4s var(--spring),background-color .3s}#lg:hover{background:var(--ember)}
@@ -119,18 +126,23 @@ footer .credit{font-size:clamp(4px,1.1vw,6px);white-space:nowrap;color:var(--emb
 .b1{width:75vmax;height:75vmax;left:-18vmax;top:-22vmax;background:radial-gradient(closest-side,rgba(143,175,192,.95),rgba(143,175,192,.88) 40%,rgba(143,175,192,.45) 72%,rgba(143,175,192,0));opacity:.4}
 .b2{width:65vmax;height:65vmax;right:-22vmax;bottom:-28vmax;background:radial-gradient(closest-side,rgba(242,240,233,.95),rgba(242,240,233,.88) 40%,rgba(242,240,233,.45) 72%,rgba(242,240,233,0));opacity:.2;animation-duration:42s!important}
 @keyframes morph{0%{transform:translate(0,0) scale(1,.92)}100%{transform:translate(8vmax,6vmax) rotate(30deg) scale(.94,1.04)}}
-#waves{position:fixed;inset:-80px;z-index:-1;pointer-events:none;overflow:hidden;filter:blur(7px)}  /* inset: the blur must not fade the screen edges */
-#waves svg{position:absolute;left:0;top:0;width:200%;height:100%;animation:drift linear infinite}
+#waves{position:fixed;inset:-80px;z-index:-1;pointer-events:none;overflow:hidden;filter:blur(7px);transform:translateZ(0);will-change:transform;contain:paint}  /* inset: the blur must not fade the screen edges */
+#waves svg{position:absolute;left:0;top:0;width:200%;height:100%;animation:drift linear infinite;will-change:transform;backface-visibility:hidden}
 @keyframes drift{to{transform:translateX(-50%)}}
 /* fine noise dithers the big gradients: 8-bit colour steps (banding) are what looked pixelated */
-.bg::after{content:"";position:absolute;inset:0;opacity:.07;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.bg::after{content:"";position:absolute;inset:0;transform:translateZ(0);opacity:.07;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
 @media(min-width:901px){main.res .col,main.res .card{scale:.88}}  /* shrinks around each block's own centre, so the centre points do not move */
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.st{opacity:1;transform:none}}
 @media(max-width:900px){
  /* mobile: one centred column -> disc on top, search bar under it, results under the search bar */
- body{display:flex;flex-direction:column;padding-bottom:0}
- main,main:not(.res),main.res{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;flex:1;min-height:0;gap:48px;padding:84px 24px 32px}
+ /* header owns its own strip: the page scrolls only inside main, below the nav, so content is cut at the header's bottom edge */
+ html,body{height:100%;overflow:hidden}
+ body{display:flex;flex-direction:column;padding-bottom:0;height:100svh}
+ nav{position:static;flex:none;padding-bottom:12px}
+ main{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+ main .stage,main .card,main .search,main #clear,main #m,main #dr,main footer{flex-shrink:0}
+ main,main:not(.res),main.res{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;flex:1;min-height:0;gap:48px;padding:24px 24px 32px}
  .col,.under{display:contents}  /* children join main's column so each can be ordered on its own */
  main .stage,main:not(.res) .stage{order:1;flex:none;width:min(100%,360px,42svh);max-width:none;margin:0 auto}
  main .card,main.res .card{order:2;justify-self:auto;width:100%;max-width:320px;margin-top:-2px}
@@ -140,7 +152,7 @@ footer .credit{font-size:clamp(4px,1.1vw,6px);white-space:nowrap;color:var(--emb
  main .drawer>ul,main .drawer.open>ul{max-height:none}
  .search{order:3;position:static;align-items:stretch;gap:12px;margin:0;width:100%;max-width:340px;padding:0;background:none;border:0}  /* follows the content at a fixed distance instead of being pinned to the screen bottom */
  main .field input,main:not(.res) .field input,main.res .field input{font-size:16px}  /* 16px: iOS Safari zooms the page on smaller inputs */
- footer{order:10;position:static;inset:auto;padding:14px 24px calc(14px + env(safe-area-inset-bottom,0px))}
+ footer{order:10;position:static;inset:auto;margin-top:auto;flex-shrink:0;padding:14px 24px calc(14px + env(safe-area-inset-bottom,0px))}
  .body{font-size:22px}
 }
 </style>
@@ -149,7 +161,6 @@ footer .credit{font-size:clamp(4px,1.1vw,6px);white-space:nowrap;color:var(--emb
 <div class="bg" aria-hidden="true"><i class="b1"></i><i class="b2"></i></div>
 <div id="waves" aria-hidden="true"></div>
 <nav><div class="brand"><img class="logo" src="sounre.png" alt="" onerror="this.remove()"><span>Sounre</span></div><button class="ghost" id="lg" type="button" aria-label="Language"></button></nav>
-<footer><small data-i="foot"></small><small class="credit" data-i="credit"></small></footer>
 <main id="mn">
   <div class="col">
     <div class="search" id="srch">
@@ -174,6 +185,7 @@ footer .credit{font-size:clamp(4px,1.1vw,6px);white-space:nowrap;color:var(--emb
     <button class="pill" id="pl" type="button" hidden></button>
     <div class="ln" id="ln" hidden><a class="pill" id="sp" target="_blank" rel="noopener" aria-label="Spotify" title="Spotify" hidden><svg viewBox="-2.4 -2.4 28.8 28.8" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></a><a class="pill" id="am" target="_blank" rel="noopener" aria-label="Apple Music" title="Apple Music" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M9 18V6.5l10-2V16a3 3 0 11-1.5-2.6V8.3L10.5 9.7V18a3 3 0 11-1.5-2.6z"/></svg></a><a class="pill" id="yt" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 00-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 002.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 001.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 001.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3z"/></svg></a></div>
       </div>
+  <footer><small data-i="foot"></small><small class="credit" data-i="credit"></small></footer>
 </main>
 <script>
 const $=id=>document.getElementById(id);
@@ -183,24 +195,27 @@ const T={
  tr:{foot:'Şarkı ara, türlerini gör',ph_song:'Şarkı adı',ph_artist:'Sanatçı adı',ph_all:'Şarkı ve/veya sanatçı',song:'Şarkı',artist:'Sanatçı',all:'Tümü',go:'Ara',clear:'Temizle',play:'▶ 30 sn dinle',loading:'Yükleniyor…',resume:'▶ Devam',pause:'❚❚ Durdur',
   credit:'* Veri: {MusicBrainz} · Kapak: {Cover Art Archive} · Öneri: {ListenBrainz} · Önizleme: {Apple}',similar:'Benzer şarkılar',simbtn:'Benzerini bul',
   searching:'Aranıyor…',none:'Sonuç yok. Başka bir yazım dene.',nogenre:'Bu şarkı için tür verisi bulunamadı.',demo:'Sunucuya ulaşılamadı — örnek veri gösteriliyor.',error:'Bir sorun oluştu. Lütfen tekrar dene.'},
- en:{foot:'Search a song, find its genres',ph_song:'Song title',ph_artist:'Artist name',ph_all:'Song and/or artist',song:'Song',artist:'Artist',all:'All',go:'Search',clear:'Clear',play:'▶ Play 30 s preview',loading:'Loading…',resume:'▶ Resume',pause:'❚❚ Pause',
+ en:{foot:'Let your [soun]d glide into its gen[re].',ph_song:'Song title',ph_artist:'Artist name',ph_all:'Song and/or artist',song:'Song',artist:'Artist',all:'All',go:'Search',clear:'Clear',play:'▶ Play 30 s',loading:'Loading…',resume:'▶ Resume',pause:'❚❚ Pause',
   credit:'* Data: MusicBrainz · Cover: Cover Art Archive · Similar: ListenBrainz · Preview: Apple',similar:'Similar songs',simbtn:'Find similar',
   searching:'Searching…',none:'No results. Try another spelling.',nogenre:'No genre data found for this song.',demo:'Server unreachable — showing sample data.',error:'Something went wrong. Please try again.'}
 };
 let L='en';try{L=localStorage.getItem('lang')||((navigator.language||'').toLowerCase().startsWith('tr')?'tr':'en')}catch(e){L=(navigator.language||'').toLowerCase().startsWith('tr')?'tr':'en'}
 const t=k=>T[L][k];
-const setText=(n,s)=>n.replaceChildren(...s.split(/\{(.*?)\}/).map((p,i)=>{if(i%2===0)return p;const e=document.createElement('span');e.lang='en';e.textContent=p;return e}));  /* {Brand} -> <span lang=en>: Turkish uppercase rules would turn its i into İ */
+const setText=(n,s)=>{const out=[],re=/\{(.*?)\}|\[(.*?)\]/g;let i=0,m;while((m=re.exec(s))){if(m.index>i)out.push(s.slice(i,m.index));const e=document.createElement('span');if(m[1]!=null){e.lang='en';e.textContent=m[1]}else{e.className='hl';e.textContent=m[2]}out.push(e);i=re.lastIndex}if(i<s.length)out.push(s.slice(i));n.replaceChildren(...out)};  /* {Brand} -> <span lang=en>: Turkish uppercase rules would turn its i into İ; [word] -> underlined highlight */
 let K='song';try{K=['artist','all'].find(k=>k===localStorage.getItem('kind'))||'song'}catch(e){}
 /* text-transform follows lang: Turkish rules turn "hip hop" into "HİP HOP", so only Turkish-looking text gets lang=tr */
+const nz=s=>(s||'').toLowerCase().replace(/[^a-z0-9çğıöşü]/g,'');
+/* a genre the server translated into Turkish (name differs from its English tag) gets lang=tr so uppercase gives KLASİK; untranslated English names stay lang=en (hip hop stays HIP HOP) */
+const gl=(n,tag)=>L==='tr'&&tag&&nz(n)!==nz(tag)?'tr':lg(n);
 const lg=s=>/[ğışİçöü]/i.test(s)?'tr':'en';
 const get=async(u,signal)=>{const r=await fetch(u,{headers:{Accept:'application/json'},signal});if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(typeof j.detail==='string'?j.detail:t('error'))}return r.json()};
 const au=new Audio(),pl=$('pl');
-let tried=false;let blobUrl=null;  /* the user pressed play for this song: from then on the disc follows the playback */
-const setPl=()=>{pl.textContent=t(au.paused?(au.currentTime>0&&!au.ended?'resume':'play'):'pause');$('cd').classList.toggle('wait',tried&&au.paused)};
-pl.onclick=()=>{if(au.paused){tried=true;$('cd').classList.add('wait');pl.textContent=t('loading');au.play().catch(setPl)}else au.pause()};au.preload='auto';au.onplaying=au.onpause=au.onended=setPl;  /* 'play' fires on click, before any sound: only 'playing' flips the label */
+let tried=false;  /* the user pressed play for this song: from then on the disc follows the playback */
+const spin=()=>$('cd').getAnimations().find(a=>a.animationName==='spin');  /* pause()/play() on the animation itself keeps the exact angle */
+const setPl=()=>{pl.textContent=t(au.paused?(au.currentTime>0&&!au.ended?'resume':'play'):'pause');const w=tried&&au.paused;const sp=spin();if(sp){if(w)sp.pause();else if(sp.playState==='paused')sp.play()}};
+pl.onclick=()=>{if(au.paused){tried=true;spin()?.play();pl.textContent=t('loading');au.play().catch(setPl)}else au.pause()};au.preload='auto';au.onplaying=au.onpause=au.onended=setPl;  /* 'play' fires on click, before any sound: only 'playing' flips the label */
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-/* covers: warmed on hover, loaded on pick in parallel with the analysis (never blocking it) */
-const warmed=new Set();const warm=u=>{if(u&&!warmed.has(u)){warmed.add(u);new Image().src=u}};
+/* covers: loaded on pick in parallel with the analysis (never blocking it) */
 /* one in-flight set of requests per screen: starting a new search/pick cancels the previous ones (server side too: the closed connection cancels the queued upstream calls) */
 const hot=new Set();const warmApple=x=>{const k=x.title+'|'+x.artist;if(x.demo||hot.has(k))return;hot.add(k);fetch(API+'/cover?title='+encodeURIComponent(x.title)+'&artist='+encodeURIComponent(x.artist||'')).catch(()=>{})};  /* hover: iTunes lookup starts before the click; the answer lands in the server and browser cache */
 let sAbort=null,pAbort=null,cvStops=[],covered=0;
@@ -230,13 +245,13 @@ $('lg').onclick=()=>{L=L==='tr'?'en':'tr';try{localStorage.setItem('lang',L)}cat
 const cv=(a,b)=>'url("data:image/svg+xml,'+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='"+a+"'/><circle cx='50' cy='50' r='36' fill='"+b+"'/><circle cx='50' cy='50' r='15' fill='"+a+"'/><polygon points='50,6 60,30 40,30' fill='"+b+"'/></svg>")+'")';
 const mkd=(title,artist,album,c1,c2,tags)=>{const s=tags.reduce((a,b)=>a+b[1],0);return{demo:true,title,artist,album,cover:cv(c1,c2),genres:tags.map(([name,n])=>({name,percent:n/s*100}))}};
 const DEMO=[
- mkd('Gece Yarısı Treni','Örnek Sanatçı','İlk Albüm','#362A22','#F2F0E9',[['indie rock',42],['alternative rock',28],['shoegaze',15],['dream pop',9],['post-punk',6]]),
+ mkd('Gece Yarısı Treni','Örnek Sanatçı','İlk Albüm','#523F33','#F2F0E9',[['indie rock',42],['alternative rock',28],['shoegaze',15],['dream pop',9],['post-punk',6]]),
  mkd('Sessiz Dalga','Demo Band','Kıyı','#7A6A5F','#D9D6CE',[['electronic',50],['ambient',30],['synth-pop',20]]),
  mkd('Altın Saat','Test Orkestra','Mevsimler','#8A7A6E','#F2F0E9',[['jazz',60],['soul',25],['funk',10],['blues',5]])
 ];
 const DEF='conic-gradient(from 20deg,#d9d9dc,#8e8e94 12%,#eee 25%,#9a9aa0 40%,#d4d4d8 55%,#7f7f86 70%,#e8e8ea 85%,#d9d9dc)';$('cd').style.setProperty('--cover',DEF);
 
-const rewind=()=>{const c=$('cd');c.style.animation='none';void c.offsetWidth;c.style.animation='';c.classList.remove('wait');tried=false};  /* restart the spin animation: the disc goes back to its first angle */
+const rewind=()=>{const c=$('cd');c.style.animation='none';void c.offsetWidth;c.style.animation='';tried=false};  /* restart the spin animation: the disc goes back to its first angle */
 $('clear').onclick=()=>{busy++;rewind();cur=null;cancelSearch();cancelPick();$('q').value='';$('m').textContent='';$('r').replaceChildren();$('dr').classList.remove('open');
   $('mn').classList.remove('res');$('sub').textContent='';$('g').replaceChildren();$('rec').hidden=true;$('rl').replaceChildren();
   drawPie([]);act(-1);au.pause();pl.hidden=true;$('ln').hidden=true;$('clear').hidden=true;$('stg').classList.remove('has');
@@ -293,7 +308,7 @@ function act(k){const D=drawPie.data||[],tip=$('tip');
   D.forEach((d,i)=>{d.e&&d.e.classList.toggle('on',i===k);d.row&&d.row.classList.toggle('on',i===k)});
   if(k<0||!D[k]){tip.classList.remove('on');return}
   const d=D[k],a=d.mid*2*Math.PI-Math.PI/2,cx=Math.cos(a),cy=Math.sin(a);
-  const b=document.createElement('b');b.textContent=d.n;b.lang=lg(d.n);tip.replaceChildren(b);
+  const b=document.createElement('b');b.textContent=d.n;b.lang=gl(d.n,d.tag);tip.replaceChildren(b);
   const st=$('stg'),W=st.offsetWidth,H=st.offsetHeight,hw=tip.offsetWidth/2,hh=tip.offsetHeight/2,r=W*.475,R=W*.495+12;
   const box=st.getBoundingClientRect(),lo=hw+8-box.left,hi=innerWidth-hw-8-box.left,arrow=Math.max(34,W*.09),dist=r+arrow+Math.abs(cx)*hw+Math.abs(cy)*hh;  /* arrow = gap between label and ring, i.e. the visible line length */
   let px=W/2+cx*dist,py=H/2+cy*dist;
@@ -328,7 +343,7 @@ function drawPie(data){
   drawPie.data=data;
   const pie=$('pie'),NS='http://www.w3.org/2000/svg';pie.replaceChildren();
   if(!data.length){const r=document.createElementNS(NS,'circle');
-    [['cx',50],['cy',50],['r',47.5],['stroke','none']].forEach(([n,v])=>r.setAttribute(n,v));r.style.fill='#362A22';pie.append(r)}
+    [['cx',50],['cy',50],['r',47.5],['stroke','none']].forEach(([n,v])=>r.setAttribute(n,v));r.style.fill='#1E2830';pie.append(r)}
   const items=[];let acc=0;
   data.forEach((d,k)=>{
     const e=document.createElementNS(NS,'circle');
@@ -344,21 +359,19 @@ function drawPie(data){
   if(items.length)requestAnimationFrame(step);
 }
 async function pick(x){
-  const id=++busy;cur=x;cancelPick();const ac=pAbort=new AbortController();au.pause();if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null};pl.hidden=true;
+  const id=++busy;cur=x;cancelPick();const ac=pAbort=new AbortController();au.pause();pl.hidden=true;
   const head=[x.artist,x.title].filter(Boolean).join(' - ');$('sub').textContent=head;$('sub').lang=lg(head);$('g').replaceChildren();$('rec').hidden=true;$('rl').replaceChildren();drawPie([]);act(-1);
   $('mn').classList.add('res');
   const stg=$('stg');stg.classList.remove('has');setTimeout(()=>stg.classList.add('has'),90);
   rewind();$('cd').classList.add('load');$('cd').style.removeProperty('--cover');
   $('ln').hidden=true;$('sim').hidden=true;
   let d={genres:x.genres||[]},coverP=Promise.resolve(true);
-  let pv='';const setPreview=u=>{if(id!==busy||!u||u===pv)return;pv=u;au.src=u;pl.hidden=false;setPl();};
+  let pv='';const setPreview=u=>{if(id!==busy||!u||u===pv)return;pv=u;au.src=u;au.load();pl.hidden=false;setPl();};
   if(x.demo)$('cd').style.setProperty('--cover',x.cover);
   else{
-    /* two covers race from the start: the archive one (URL already known) and Apple's fast CDN (a tiny lookup, no waiting for the analysis) */
-    coverP=anyOk([
-      wait(1500).then(()=>id!==busy?false:covered===id?true:loadCover(x.cover_url,id)),  /* archive.org is slow: only a fallback if Apple has not delivered */
-      get(API+'/cover?title='+encodeURIComponent(x.title)+'&artist='+encodeURIComponent(x.artist||''),ac.signal).then(r=>{setPreview(r.preview_url);return loadCover(r.url,id)}).catch(()=>false)
-    ]);
+    /* cover: Apple's artwork first (a tiny lookup, no waiting for the analysis); the archive.org cover only if Apple has none or it fails to load */
+    coverP=get(API+'/cover?title='+encodeURIComponent(x.title)+'&artist='+encodeURIComponent(x.artist||''),ac.signal).then(r=>{setPreview(r.preview_url);return loadCover(r.url,id)}).catch(()=>false)
+      .then(ok=>ok||id!==busy?ok:loadCover(x.cover_url,id));
     try{d=await get(API+'/analyze?mbid='+encodeURIComponent(x.id)+'&lang='+L,ac.signal)}catch(e){if(isAbort(e))return;d={genres:[],error:e instanceof TypeError?t('error'):e.message}}
     if(id!==busy)return;
     setPreview(d.preview_url);
@@ -376,7 +389,7 @@ async function pick(x){
     data.forEach((dd,k)=>{
       const row=document.createElement('div');row.className='row st';row.tabIndex=0;row.style.setProperty('--i',k+2);
       const sw=document.createElement('i'),n=document.createElement('span'),v=document.createElement('span');
-      sw.className='sw';sw.style.background=dd.c;n.textContent=dd.n;n.lang=lg(dd.n);v.textContent='%'+Math.round(dd.f);
+      sw.className='sw';sw.style.background=dd.c;n.textContent=dd.n;n.lang=gl(dd.n,dd.tag);v.textContent='%'+Math.round(dd.f);
       row.append(sw,n,v);
       row.onpointerenter=row.onfocus=()=>act(k);row.onpointerleave=row.onblur=()=>act(-1);
       dd.row=row;g.append(row)});
@@ -396,6 +409,26 @@ async function pick(x){
   await Promise.race([coverP,wait(3000)]);if(id===busy)$('cd').classList.remove('load');
 }
 drawPie([]);applyLang();
+/* logo: still image by default; the animated one (sounre_logo.png) plays while the pointer is over it. It is fetched on the first hover and swapped in only once it has loaded, so a missing file never breaks the logo */
+{const logo=document.querySelector('.logo'),brand=logo&&logo.parentNode;
+ if(brand){
+  /* both logo files have different empty margins around the swan, so the swan looked smaller on hover.
+     Each image is measured (its non-transparent pixels) and given a transform that makes the swan exactly TARGET px tall and centred in the BOX, so both look identical. */
+  const BOX=36,TARGET=32,fits={};
+  const measure=im=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h)return '';
+    const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);
+    const d=x.getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;
+    for(let j=0;j<h;j++)for(let i=0;i<w;i++)if(d[(j*w+i)*4+3]>10){if(i<x0)x0=i;if(i>x1)x1=i;if(j<y0)y0=j;if(j>y1)y1=j}
+    if(x1<0)return '';
+    const s=Math.min(BOX/w,BOX/h),k=TARGET/((y1-y0+1)*s),cx=(x0+x1+1)/2-w/2,cy=(y0+y1+1)/2-h/2;
+    return 'translate('+(-k*cx*s)+'px,'+(-k*cy*s)+'px) scale('+k+')'}catch(e){return ''}};  /* canvas blocked (e.g. file://): no correction, logo stays as is */
+  const show=n=>{logo.src=n;logo.style.transform=fits[n]||''};
+  let gifOk=false,over=false;
+  const load=(n,cb)=>{const im=new Image();im.onload=()=>{fits[n]=measure(im);if(logo.getAttribute('src')===n)logo.style.transform=fits[n];cb&&cb()};im.src=n};
+  load('sounre.png');
+  load('sounre_logo.png',()=>{gifOk=true;if(over)show('sounre_logo.png')});
+  brand.addEventListener('pointerenter',()=>{over=true;if(gifOk)show('sounre_logo.png')});
+  brand.addEventListener('pointerleave',()=>{over=false;show('sounre.png')})}}
 /* waves: vector paths drawn once and slid sideways by the browser (whole periods per half-width = seamless loop); the whole layer is blurred by CSS */
 $('waves').innerHTML=[[.10,36,1,'143,175,192',.24,80],[.26,44,2,'242,240,233',.11,-100],[.42,40,1,'143,175,192',.20,70],[.60,48,2,'74,58,49',.40,-90],[.78,32,3,'242,240,233',.08,110]]
  .map(([y,a,f,c,o,d],i)=>{let p='M0 1000';for(let x=0;x<=2000;x+=5)p+='L'+x+' '+(y*1000+Math.sin(x*Math.PI*f/500+i)*a+Math.sin(x*Math.PI*3*f/500)*a*.25).toFixed(1);

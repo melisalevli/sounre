@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 from .clients.itunes import ITunes
 from .clients.listenbrainz import ListenBrainz
-from .clients.musicbrainz import MusicBrainz
+from .clients.musicbrainz import JUNK, MusicBrainz
 from .clients.spotify import Spotify
 from .errors import AppError
 from .genres import blend, group_key, profile, rank_weights, required_genres, similarity, strength
@@ -35,7 +35,6 @@ _VERSION = re.compile(
     r"|\s+[-\u2013]\s+[^-\u2013]*\b(?:live|remaster(?:ed)?|acoustic|demo|radio edit|single version|album version|mono|stereo)\b.*$",
     re.I,
 )
-_JUNK_TITLE = re.compile(r"karaoke|tribute|made famous|originally performed|in the style of|backing track", re.I)
 
 
 def _sig(t: dict) -> tuple[str, str]:
@@ -100,7 +99,7 @@ async def _best_top_songs(mb: MusicBrainz, lb: ListenBrainz, query: str) -> list
         log.warning("artist lookup failed for %r: %s", query, exc.key)
         return []
     lists = await asyncio.gather(*(_top_songs(lb, i) for i in ids))
-    lists = [[t for t in top if not _JUNK_TITLE.search(f"{t['title']} {t['artist']}")] for top in lists]
+    lists = [[t for t in top if not JUNK.search(f"{t['title']} {t['artist']}")] for top in lists]
     return max(lists, key=lambda top: sum(t.get("listens", 0) for t in top[:5]), default=[])
 
 
@@ -274,7 +273,7 @@ async def _mixes(lb: ListenBrainz, ids: list[str]) -> list[tuple[dict, dict[str,
     for i in ids:
         if not (p := found.get(i)):
             continue
-        recording, _, artist_votes = p["votes"]
+        recording, artist_votes = p["votes"]
         rich = RICH_VOTES is not None and strength(recording) >= RICH_VOTES
         votes = (recording, [] if rich else artist_votes)
         evidence = sum(strength(v) for v in votes)

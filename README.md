@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="app/static/sounre.png" alt="Sounre logo" width="160" />
+  <img src="app/static/sounre_logo.png" alt="Sounre logo" width="160" />
 </p>
 
 <h1 align="center">Sounre</h1>
 
 <p align="center">
-  <a href="https://sounre.onrender.com">sounre.onrender.com</a>
+  <a href="https://sounre.onrender.com">sounre.com</a>
 </p>
 
 <p align="center">
@@ -16,27 +16,43 @@
 
 ## What is Sounre?
 
-Sounre is a small web app that shows the genre mix of a song.
+Sounre shows the genre mix of a song, for example 56% synthpop, 37% new wave, 6% pop. The mix is displayed as a pie chart ring around a CD of the cover.
 
-Most songs aren't one genre. A track can be 56% synthpop, 37% new wave and 6% pop. You type in a song or an artist, pick the right result, and Sounre draws its genres as a pie chart next to a spinning CD of the cover. From there you can click a genre to find songs where that genre is strongest, or press **Find similar** to get songs whose genre mix is closest to the one you're looking at.
+- Search by song, artist, or both.
+- Clicking a genre lists songs where that genre has the largest share.
+- **Find similar** lists songs with the closest overall genre mix.
+- A 30-second preview plays in the page. Links open the song on Spotify, Apple Music or YouTube.
+- The header button switches between Turkish and English, including genre names. The default language follows the browser language: Turkish if it starts with `tr`, otherwise English.
 
-### How to use it
+---
 
-1. **Pick what to search.** Choose *Song*, *Artist* or *Song and/or artist* above the search field.
-2. **Search.** Type and press the button. A short list of results appears.
-3. **Choose a result.** The page shows the genre pie chart, the cover, and the genres with their percentages.
-4. **Follow a genre.** Click a genre to get songs where that genre has the biggest share.
-5. **Find similar.** Press the button to get songs with the closest overall mix.
-6. **Listen.** Play the 30-second preview, or open the song on Spotify, Apple Music or YouTube.
-7. **Switch language.** The button in the header toggles Turkish and English, including genre names.
+## Design
 
-If the server can't be reached, the page falls back to a few sample songs so the interface still works.
+**Name.** soun(d) % gen(re). *Soun* comes from sound, *re* from genre, and % refers to the genre percentages.
+
+**Symbol.** The logo is a swan, which can turn into a ballerina or an eighth note.
+
+**Palette.** Based on Swan Lake: pale lake blue, cream and deep brown.
+
+| Role | Color | Hex |
+| --- | --- | --- |
+| Text, swan | cream | `#F2F0E9` |
+| Accent, lake | pale blue | `#8FAFC0` |
+| Background | walnut | `#4A3A31` |
+| Surfaces | bark | `#523F33` |
+| Muted | cork | `#7A6A5F` |
+
+Genre slices use cream and blue tints plus warm neutrals (`#C5D4DA`, `#6F8C9C`, `#B8A99A`, `#D9CFC0`).
+
+**Interface.** Dark background, small uppercase letter-spaced labels, pill and outlined buttons, system fonts (no font downloads). The background consists of blurred shapes, sliding waves and fine noise.
+
+**Visualization.** A pie chart ring shows the genre mix around a spinning CD that shows the cover. The CD spins by default. After a preview is started for a song, it spins only while the preview plays.
 
 ---
 
 ## Getting started
 
-**Requirements:** Python 3.12 or newer.
+Requires Python 3.12 or newer.
 
 ```bash
 git clone https://github.com/melisalevli/sounre.git
@@ -44,104 +60,89 @@ cd sounre
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-export SOUNRE_CONTACT="your-email@example.com" // or "https://your-site.example"
+export SOUNRE_CONTACT="your-email@example.com"   # or a website: "https://your-site.example"
 uvicorn app.main:create_app --factory --reload
 ```
 
-Then open http://localhost:8000.
+The app runs at http://localhost:8000.
 
-`SOUNRE_CONTACT` is required. MusicBrainz asks every client to identify itself with an email or a website, and Sounre puts this value in its User-Agent. A website keeps your inbox private.
+`SOUNRE_CONTACT` is required. MusicBrainz requires clients to identify themselves with an email or website, and the value is sent in the User-Agent.
 
 ---
 
 ## How it works
 
-### Stack
-
 | Piece | Choice |
 | --- | --- |
 | Backend | [FastAPI](https://fastapi.tiangolo.com) on [uvicorn](https://www.uvicorn.org) |
 | Upstream calls | [httpx](https://www.python-httpx.org) |
-| Cache | [diskcache](https://grantjenks.com/docs/diskcache/) (SQLite on disk, values stored as JSON) |
-| Frontend | One static HTML file with plain CSS and JavaScript, no framework and no build step |
-| Data | MusicBrainz, ListenBrainz, Cover Art Archive, iTunes Search API |
-| Hosting | Render (free plan) |
+| Cache | [diskcache](https://grantjenks.com/docs/diskcache/) (SQLite, values stored as JSON) |
+| Frontend | One static HTML file, plain CSS and JavaScript, no build step |
+| Hosting | Render |
 
-There is no database server, no user accounts, and no API key. One process serves both the API and the page.
+There is no database server, user account system or required API key. One process serves the API and the page.
 
-### Where the data comes from
+### Data sources
 
-- **MusicBrainz** for genre tags. They are crowd-sourced, so the percentages reflect community opinion, not measurement.
-- **ListenBrainz** for listen counts and similar-song candidates.
-- **Cover Art Archive** for covers, with the **iTunes Search API** as a backup and for previews and Apple Music links.
-- **Spotify** is optional. Without credentials the Spotify button is a search link; with them it links to the exact track.
+- **MusicBrainz:** genre tags (crowd-sourced, so percentages reflect community opinion).
+- **ListenBrainz:** listen counts and similar-song candidates.
+- **iTunes Search API:** cover, 30-second preview, Apple Music link.
+- **Cover Art Archive:** fallback cover when Apple has none.
+- **Spotify (optional):** exact track link when credentials are set, otherwise a search link.
 
-### The idea in four lines
+### Method
 
-- **Genre mix.** A song's tag votes (weight 3) are blended with its artist's tag votes (weight 1). Spellings are merged ("synth-pop" and "synthpop" count as one), noise like "favorites" is dropped, and the top six genres become percentages.
-- **Similarity.** Two genre mixes are compared with a weighted score from 0 to 1. The biggest genre of the song you picked counts most.
-- **Politeness.** MusicBrainz allows one request per second, so every call to it goes through a single limiter and every answer is cached.
-- **Protection.** Each visitor IP gets a points budget per minute, and the server cancels work the browser has already abandoned.
+- **Genre mix:** song tag votes (weight 3) are blended with artist tag votes (weight 1). Spellings are merged, noise tags are dropped, and the top six genres become percentages.
+- **Similarity:** a weighted score from 0 to 1, in which the largest genre of the selected song counts most.
+- **Rate limiting:** MusicBrainz requests go through a single limiter at one request per second, and all answers are cached.
+- **Abuse protection:** each IP has a points budget per minute, and work abandoned by the browser is cancelled.
 
-The full write-up, with the flows, request and response formats, and the maths, is in [TECHNICAL.md](TECHNICAL.md).
+Formats and formulas are described in [TECHNICAL.md](TECHNICAL.md).
 
 ### API
 
-All routes live under `/api/v1`.
+All routes are under `/api/v1`.
 
 | Route | Returns |
 | --- | --- |
 | `GET /search?query=&kind=song\|artist\|all` | Matching songs, most listened first |
-| `GET /analyze?mbid=&lang=en\|tr` | Genre percentages plus cover, preview and streaming links |
-| `GET /cover?title=&artist=` | Cover, preview and Apple Music link, so the page needn't wait for `/analyze` |
+| `GET /analyze?mbid=&lang=en\|tr` | Genre percentages, cover, preview, streaming links |
+| `GET /cover?title=&artist=` | Cover, preview, Apple Music link |
 | `GET /similar?mbid=&g=tag:percent&g=...` | Songs with the most similar genre mix |
-| `GET /similar-genres?mbid=&genre=` | Songs where one genre has the biggest share |
+| `GET /similar-genres?mbid=&genre=` | Songs where one genre has the largest share |
 
 ### Settings
 
-| Variable | Default | What it does |
+| Variable | Default | Purpose |
 | --- | --- | --- |
 | `SOUNRE_CONTACT` | none (required) | Email or URL sent to MusicBrainz in the User-Agent |
-| `SOUNRE_CACHE_DIR` | `.cache` | Where the SQLite cache lives |
+| `SOUNRE_CACHE_DIR` | `.cache` | Cache location |
 | `SOUNRE_IP_BUDGET` | `120` | Points per minute per visitor IP |
-| `SOUNRE_PROXY` | `none` | Where the visitor's IP comes from: `none`, `cloudflare`, or `forwarded` |
-| `SOUNRE_PROXY_HOPS` | `1` | With `forwarded`: which `X-Forwarded-For` entry, counted from the right, is the visitor (Render: `2`) |
-| `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` | none | Optional, for exact Spotify links |
-
----
-
-## Design
-
-The interface is dark and quiet, so the music is what stands out. The palette is a warm, limited set: cream text on walnut and bark browns, with a single pale blue accent. Labels are small, uppercase and letter-spaced, and buttons are simple pills or outlined ghosts.
-
-The genre mix is a pie chart and the cover is a spinning CD, because a song is easier to read as a shape than as a list of numbers. Motion shows state: things ease in, and the CD spins while a preview plays.
-
-Text uses each device's own system font, so no fonts are downloaded from anywhere.
+| `SOUNRE_PROXY` | `none` | Source of the visitor IP: `none`, `cloudflare`, `forwarded` |
+| `SOUNRE_PROXY_HOPS` | `1` | With `forwarded`: position of the visitor in `X-Forwarded-For`, counted from the right (Render: `2`) |
+| `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` | none | Optional, enable exact Spotify links |
 
 ---
 
 ## Privacy
 
-Sounre has no accounts, no cookies, and no user database. It does not log visitor IPs or searches (only upstream failures), and the per-IP budgets live in memory and disappear on restart. Your host's own logs may still record IPs.
+The app has no accounts, cookies or user database. The language and search mode are stored in the browser's localStorage. Per-IP budgets are kept in memory and reset on restart.
 
-Search text is sent to MusicBrainz, ListenBrainz and Apple. Your browser loads covers from Cover Art Archive and Apple and previews from Apple, so those hosts see the visitor's IP.
+Search text is sent to MusicBrainz, ListenBrainz and Apple. The browser loads covers and previews from Apple (and covers from Cover Art Archive when used), so those hosts see the visitor's IP.
 
 ---
 
-## Deployment: Render
+## Deployment
 
-Sounre runs on the **free plan on Render**, configured by `render.yaml`.
+Deployment is configured by `render.yaml`. The repository is pushed to GitHub, deployed in Render through **New → Blueprint**, and `SOUNRE_CONTACT` is set to the site URL.
 
-1. Push the repo to GitHub.
-2. In Render choose **New → Blueprint** and pick the repo.
-3. Enter `SOUNRE_CONTACT` (the site's URL) when asked.
-
-The free plan sleeps when idle, so the first request after a quiet spell can take up to a minute, and its disk is ephemeral, so the cache starts empty after a restart. Both are fine for a cache. Keep it at one worker, because the limiter and the budgets live in the process.
+- The service sleeps when idle, and the first request afterwards can take up to a minute.
+- The disk is ephemeral, so the cache is empty after a restart.
+- Only one worker is used, because the rate limiter and budgets live in the process.
 
 ---
 
 ## Known limits
 
-- Genre data is only as good as MusicBrainz's community tags, and obscure songs may have few or none.
-- The weights and the similarity score are design choices, not a scientific measure of how songs sound.
-- The repo has no automated tests; I removed them to keep it minimal.
+- Genre data depends on MusicBrainz community tags, so obscure songs may have few or none.
+- The weights and the similarity score are design choices and do not measure how songs sound.

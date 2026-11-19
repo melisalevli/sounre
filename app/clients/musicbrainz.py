@@ -24,7 +24,7 @@ _NOT_MUSIC = {"Spokenword", "Interview", "Audiobook", "Audio drama", "DJ-mix", "
 _MUSIC_TYPES = {None, "Album", "Single", "EP"}  # None: the field is absent on lookups
 
 # Recordings that are not the real song: karaoke, tribute and backing-track versions.
-_JUNK = re.compile(r"karaoke|tribute|made famous|originally performed|in the style of|backing track", re.I)
+JUNK = re.compile(r"karaoke|tribute|made famous|originally performed|in the style of|backing track", re.I)
 MIN_MS, MAX_MS = 45_000, 20 * 60_000  # drops skits/intros and long DJ sets
 
 # Narrows the search on MusicBrainz's side. If searches ever come back empty, remove the
@@ -50,7 +50,7 @@ def _is_song(rec: dict) -> bool:
     length = rec.get("length")
     if rec.get("video") or (length and not MIN_MS <= length <= MAX_MS):
         return False
-    if _JUNK.search(f"{rec.get('title', '')} {_credit(rec.get('artist-credit', []))}"):
+    if JUNK.search(f"{rec.get('title', '')} {_credit(rec.get('artist-credit', []))}"):
         return False
     return _best_release(rec) is not None
 
@@ -102,11 +102,6 @@ class MusicBrainz:
     async def _get(self, path: str, **params):
         await self._limiter.wait()
         return await get_json(self._http, f"{BASE}/{path}", fmt="json", **params)
-
-    async def artist(self, name: str) -> str | None:
-        """MBID of the artist `name` refers to (exact name preferred), or None."""
-        found = await self.artist_candidates(name)
-        return found[0] if found else None
 
     async def artist_candidates(self, name: str, limit: int = 3) -> list[str]:
         """MBIDs of the artists `name` may refer to, best name match first (several artists can share one name,

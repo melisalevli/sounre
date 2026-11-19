@@ -67,9 +67,9 @@ class ListenBrainz:
         return [r["recording_mbid"] for r in rows if r.get("recording_mbid")]
 
     async def profiles(self, mbids: list[str]) -> dict[str, dict]:
-        """Per recording: `{"track": Track dict, "votes": (recording, release_group, artist)}`, the votes as
+        """Per recording: `{"track": Track dict, "votes": (recording, artist)}`, the votes as
         `{name, count}` lists. One batched request for any number of recordings (up to BATCH)."""
-        key = "lb1:prof:" + hashlib.sha1(",".join(mbids).encode()).hexdigest()
+        key = "lb2:prof:" + hashlib.sha1(",".join(mbids).encode()).hexdigest()
         return await self._cache.get_or_set(key, DAY, lambda: self._profiles(mbids))
 
     async def _profiles(self, mbids: list[str]) -> dict[str, dict]:
@@ -85,7 +85,7 @@ class ListenBrainz:
             tag = (m or {}).get("tag") or {}
             out[mbid] = {
                 "track": track,
-                "votes": (_votes(tag.get("recording")), _votes(tag.get("release_group")), _votes(tag.get("artist"))),
+                "votes": (_votes(tag.get("recording")), _votes(tag.get("artist"))),
             }
         return out
 
