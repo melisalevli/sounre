@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="app/static/sounre_logo.png" alt="Sounre logo" width="160" />
+  <img src="app/static/sounre.png" alt="Sounre logo" width="160" />
 </p>
 
 <h1 align="center">Sounre</h1>
